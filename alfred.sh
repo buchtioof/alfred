@@ -1,3 +1,8 @@
+#!/bin/bash
+
+export LC_ALL=C
+export LANG=C
+
 ########## MAIN VARIABLES ##########
 DATE=$(date +'%Y-%m-%d_%H:%M:%S')
 TARGET=${1:-localhost:8000}
@@ -5,7 +10,23 @@ TARGET=${1:-localhost:8000}
 ########## TEMPORARY WORKING REPERTORY ##########
 export PATH="$(pwd)/bin:$PATH"
 
-############ HARDWARE FETCHER #################
+MACHINE_ARCH=$(uname -m)
+BIN_DIR="$(pwd)/bin"
+
+case "$MACHINE_ARCH" in
+    x86_64)
+        ln -sf "$BIN_DIR/jq64" "$BIN_DIR/jq"
+        ;;
+    aarch64|arm64)
+        ln -sf "$BIN_DIR/jq_arm64" "$BIN_DIR/jq"
+        ;;
+    *)
+        echo "ERROR: This architecture not supported for the moment: ($MACHINE_ARCH)"
+        exit 1
+        ;;
+esac
+
+############ GRABBER #################
 # --- CPU ---
 CPU_MODEL=$(lscpu | grep "Model name:" | cut -d: -f2 | sed 's/^ *//')
 _VENDOR=$(lscpu | grep "Vendor ID:" | cut -d: -f2 | xargs)
@@ -31,10 +52,9 @@ MB_SERIAL=$(inxi -M -c 0 | grep "Mobo:" | sed -E 's/.*Mobo: (.*) model: (.*) ser
 GPU_MODEL=$(inxi -G -c 0 | grep "Device-1:" | cut -d: -f2 | xargs)
 
 # --- STORAGE ---
-# Calcul du stockage total
 SIZES=$(lsblk -dnb | grep -v loop | grep -v boot | tr -s " " | cut -d \  -f4)
 TOTAL_STORAGE=0
-for SIZE in ${SIZES[@]}; do TOTAL_STORAGE=$((TOTAL_STORAGE + SIZE)); done
+for SIZE in $SIZES; do TOTAL_STORAGE=$((TOTAL_STORAGE + SIZE)); done
 TOTAL_STORAGE=$(numfmt --to iec $TOTAL_STORAGE)
 
 # --- SOFTWARE ---
