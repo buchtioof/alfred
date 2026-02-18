@@ -61,7 +61,7 @@ TOTAL_STORAGE=$(numfmt --to iec $TOTAL_STORAGE)
 OS=$(lsb_release -d 2>/dev/null | cut -f2 || grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '"')
 ARCH=$(uname -m)
 KERNEL=$(uname -r)
-HOSTNAME=$(hostname)
+HOSTNAME=$(uname -n)
 DEFAULT_IFACE=$(ls /sys/class/net | grep -vE '^(lo|docker|veth|br)' | head -n 1)
 MAC_ADDRESS=$(cat "/sys/class/net/$DEFAULT_IFACE/address" 2>/dev/null || echo "Unknown-MAC")
 
