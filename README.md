@@ -17,3 +17,6 @@ run alfred with this command\
 ## dependencies
 - inxi (lastest release)
 - jq (1.8.1 tested / arm64 and x86_64 supported, more later)
+
+## credits
+thanks to [inxi](https://github.com/smxi/inxi) and [jq](https://github.com/jqlang/jq)
