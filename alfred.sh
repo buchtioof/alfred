@@ -6,6 +6,7 @@ export LANG=C
 ########## MAIN VARIABLES ##########
 DATE=$(date +'%Y-%m-%d_%H:%M:%S')
 TARGET=${1:-localhost:8000}
+API_KEY=${2:-}
 
 ########## TEMPORARY WORKING REPERTORY ##########
 export PATH="$(pwd)/bin:$PATH"
@@ -115,9 +116,10 @@ json_pkg() {
     )
     
     curl -X POST "http://$TARGET/endpoint" \
+         -H "X-API-Key: $API_KEY" \
          -H "Content-Type: application/json" \
          -d "$json_data" \
-         --connect-timeout 5 || echo "Erreur: Serveur $TARGET injoignable."
+         --connect-timeout 5 || echo "[ERROR]: $TARGET server not found."
     echo ""
 }
 
